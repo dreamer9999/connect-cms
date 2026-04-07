@@ -81,11 +81,11 @@
                         @endif
                         <div class="d-md-none d-inline">
                             @if ($date->dayOfWeek == 0 || ($date->hasHoliday()))
-                            <span class="cc-color-sunday">({{$date->formatLocalized("%a")}})</span>
+                            <span class="cc-color-sunday">({{$date->isoFormat('ddd')}})</span>
                             @elseif ($date->dayOfWeek == 6)
-                            <span class="cc-color-saturday">({{$date->formatLocalized("%a")}})</span>
+                            <span class="cc-color-saturday">({{$date->isoFormat('ddd')}})</span>
                             @else
-                            ({{$date->formatLocalized("%a")}})
+                            ({{$date->isoFormat('ddd')}})
                             @endif
                             {{-- 祝日 --}}
                             @if ($date->hasHoliday())

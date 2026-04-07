@@ -8,7 +8,7 @@ use App\UserableNohistory;
 use App\Utilities\File\FileUtils;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 class Uploads extends Model
 {
@@ -147,24 +147,17 @@ class Uploads extends Model
         ini_set('memory_limit', $memory_limit_for_image_resize);
 
         // 画像オブジェクトの生成
-        $image = Image::make($file);
+        $image = Image::read($file);
 
         // 画像の回転対応: orientate()
-        $image = $image->orientate();
+        $image = $image->orient();
 
         // サイズを確認して、縮小の必要がなければそのまま返す。
         if ($image->width() <= $max_size && $image->height() <= $max_size) {
             return $image;
         }
 
-        // 縮小
-        return $image->resize(
-            $max_size,
-            $max_size,
-            function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            }
-        );
+        // 縮小（Intervention Image v3: scaleDown はアスペクト比自動維持）
+        return $image->scaleDown($max_size, $max_size);
     }
 }

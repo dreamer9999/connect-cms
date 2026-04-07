@@ -25,7 +25,7 @@
 
         <div class="text-center mb-1">
             {{-- 前月ボタン. aタグを改行しない事でオンマウスのアンダーラインを表示しない --}}
-            <a href="{{url('/')}}/plugin/reservations/month/{{$page->id}}/{{$frame->id}}/{{ $carbon_target_date->copy()->subMonthsNoOverflow('1')->format('Ym') }}#frame-{{$frame->id}}"><i class="fas fa-chevron-circle-left"></i></a>
+            <a href="{{url('/')}}/plugin/reservations/month/{{$page->id}}/{{$frame->id}}/{{ $carbon_target_date->copy()->subMonthsNoOverflow(1)->format('Ym') }}#frame-{{$frame->id}}"><i class="fas fa-chevron-circle-left"></i></a>
             {{-- 当月表示 --}}
             @if (App::getLocale() == ConnectLocale::ja)
                 <div class="h5 d-inline">{{$carbon_target_date->format('Y年')}}</div>
@@ -35,7 +35,7 @@
                 <div class="h5 d-inline">{{$carbon_target_date->format('Y')}}</div>
             @endif
             {{-- 翌月ボタン --}}
-            <a href="{{url('/')}}/plugin/reservations/month/{{$page->id}}/{{$frame->id}}/{{ $carbon_target_date->copy()->addMonthsNoOverflow('1')->format('Ym') }}#frame-{{$frame->id}}"><i class="fas fa-chevron-circle-right"></i></a>
+            <a href="{{url('/')}}/plugin/reservations/month/{{$page->id}}/{{$frame->id}}/{{ $carbon_target_date->copy()->addMonthsNoOverflow(1)->format('Ym') }}#frame-{{$frame->id}}"><i class="fas fa-chevron-circle-right"></i></a>
 
             {{-- 今月へボタン --}}
             <div class="d-inline align-bottom ml-3">

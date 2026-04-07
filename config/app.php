@@ -163,7 +163,7 @@ $app_array = [
          * Package Service Providers...
          */
         // 画像処理
-        Intervention\Image\ImageServiceProvider::class,
+        Intervention\Image\Laravel\ServiceProvider::class,
         // Captcha
         Mews\Captcha\CaptchaServiceProvider::class,
 
@@ -309,7 +309,7 @@ $app_array = [
         'Like' => \App\Models\Common\Like::class,
 
         // 画像処理
-        'Image' => Intervention\Image\Facades\Image::class,
+        'Image' => Intervention\Image\Laravel\Facades\Image::class,
         // Captcha
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
     ])->toArray(),

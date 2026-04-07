@@ -17,7 +17,7 @@ class ModLearningtasksPostsFilesUpload extends Migration
             //
             $table->renameColumn('learningtasks_posts_id', 'post_id');
             $table->renameColumn('task_file_uploads_id', 'upload_id');
-            $table->integer('task_flag')->nullable()->default(0)->after('task_file_uploads_id');
+            $table->integer('task_flag')->nullable()->default(0)->after('upload_id');
         });
     }
 

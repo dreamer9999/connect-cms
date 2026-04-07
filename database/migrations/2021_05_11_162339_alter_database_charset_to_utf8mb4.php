@@ -18,6 +18,9 @@ class AlterDatabaseCharsetToUtf8mb4 extends Migration
      */
     public function up()
     {
+        // Laravel 13: getDoctrineSchemaManager() removed. This migration is no longer needed.
+        // New installs default to utf8mb4. Existing databases already ran this migration.
+        return;
         /**
          * データベースへのマイグレーション（utf8 => utf8mb4）
          */
@@ -129,6 +132,8 @@ class AlterDatabaseCharsetToUtf8mb4 extends Migration
      */
     public function down()
     {
+        // Laravel 13: getDoctrineSchemaManager() removed.
+        return;
         /**
          * データベースへのマイグレーション（utf8mb4 => utf8）
          */

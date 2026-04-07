@@ -18,7 +18,7 @@ class ModLearningtasksUsersStatusesFileId extends Migration
             $table->renameColumn('canvas_answer_file_id', 'upload_id');
             $table->renameColumn('memo', 'comment');
             $table->renameColumn('contents_id', 'post_id');
-            $table->integer('examination_id')->nullable()->default(0)->after('canvas_answer_file_id')->comment('試験ID');
+            $table->integer('examination_id')->nullable()->default(0)->after('upload_id')->comment('試験ID');
             $table->string('grade', 255)->nullable()->after('examination_id')->comment('評価');
         });
     }

@@ -16,7 +16,7 @@ class AddTeacherFlagLearningtasksPosts extends Migration
         Schema::table('learningtasks_posts', function (Blueprint $table) {
             //
             $table->renameColumn('join_flag', 'student_join_flag');
-            $table->integer('teacher_join_flag')->nullable()->default(0)->after('join_flag')->comment('教員の参加方法');
+            $table->integer('teacher_join_flag')->nullable()->default(0)->after('student_join_flag')->comment('教員の参加方法');
         });
     }
 

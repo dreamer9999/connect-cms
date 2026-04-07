@@ -27,7 +27,7 @@ use App\Utilities\Zip\UnzipUtils;
 
 use App\Traits\ConnectCommonTrait;
 
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 use App\Plugins\User\UserPluginBase;
 use Illuminate\Support\Facades\Session;
@@ -949,7 +949,7 @@ class PhotoalbumsPlugin extends UserPluginBase
 
         // リサイズ後のバイナリデータのサイズを取得
         $extension = strtolower($file_params['extension']);
-        $resized_image_size = strlen((string) $image->encode($extension));
+        $resized_image_size = strlen((string) $image->encodeByExtension($extension));
 
         // uploads テーブルに情報追加、ファイルのid を取得する
         $upload = Uploads::create([
@@ -1164,7 +1164,7 @@ class PhotoalbumsPlugin extends UserPluginBase
             $photoalbum_content->name = empty($request->title[$frame_id]) ? '' : $request->title[$frame_id];
 
             // 写真の幅、高さ（幅、高さを取得するためにImage オブジェクトを生成しておく）
-            $img = Image::make($file->path());
+            $img = Image::read($file->path());
             $photoalbum_content->width = $img->width();
             $photoalbum_content->height = $img->height();
             $photoalbum_content->mimetype = $file->getClientMimeType();

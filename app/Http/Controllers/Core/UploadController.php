@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 /**
  * アップロードファイルの送出処理
@@ -173,19 +173,12 @@ class UploadController extends ConnectController
                 $size = config('connect.THUMBNAIL_SIZE')['LARGE'];
             }
 
-            $img = Image::cache(function ($image) use ($fullpath, $size) {
-                return $image->make($fullpath)->resize(
-                    $size,
-                    $size,
-                    function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    }
-                )->orientate();
-            }, config('connect.CACHE_MINUTS'), true); // 第3引数のtrue は戻り値にImage オブジェクトを返す意味。（false の場合は画像データ）
+            // Intervention Image v3: Image::cache() 廃止のため直接処理
+            $img = Image::read($fullpath)->scaleDown($size, $size)->orient();
+            $encoded = $img->encodeByExtension($uploads->extension);
 
             $headers['Content-Disposition'] = 'inline; ' . $content_disposition;
-            return $this->setCacheControlPrivate($img->response()->withHeaders($headers)->setEtag(md5($img->response()->getContent())));
+            return $this->setCacheControlPrivate(response($encoded, 200, $headers)->setEtag(md5($encoded)));
         }
 
         if (in_array(strtolower($uploads->extension), $inline_extensions) && $request->response != 'download') {
@@ -712,7 +705,7 @@ EOD;
         ini_set('memory_limit', $memory_limit_for_image_resize);
 
         // ファイルのリサイズ(メモリ内)
-        $image = Image::make($image_file);
+        $image = Image::read($image_file);
 
         // リサイズ
         $resize_width = null;
@@ -723,16 +716,10 @@ EOD;
             $resize_height = $request->image_size;
         }
 
-        $image = $image->resize($resize_width, $resize_height, function ($constraint) {
-            // 横幅を指定する。高さは自動調整
-            $constraint->aspectRatio();
-
-            // 小さい画像が大きくなってぼやけるのを防止
-            $constraint->upsize();
-        });
+        $image = $image->scaleDown($resize_width, $resize_height);
 
         // 画像の回転対応: orientate()
-        $image = $image->orientate();
+        $image = $image->orient();
 
         // cURLセッションを初期化する
         $ch = curl_init();
@@ -852,8 +839,8 @@ EOD;
                     ini_set('memory_limit', $memory_limit_for_image_resize);
 
                     // GDが無いとここで GD Library extension not available with this PHP installation. エラーになる
-                    // $image = Image::make($image_file)->resize($request->width, $request->height);
-                    $image = Image::make($image_file);
+                    // $image = Image::read($image_file)->resize($request->width, $request->height);
+                    $image = Image::read($image_file);
 
                     $resize_width = $request->resize;
                     $resize_height = null;
@@ -862,22 +849,16 @@ EOD;
                     //           エラーメッセージ：ERROR: Allowed memory size of 134217728 bytes exhausted (tried to allocate 48771073 bytes) {"userId":1,"exception":"[object] (Symfony\\Component\\Debug\\Exception\\FatalErrorException(code: 1): Allowed memory size of 134217728 bytes exhausted (tried to allocate 48771073 bytes) at /path_to_connect-cms/vendor/intervention/image/src/Intervention/Image/Gd/Commands/ResizeCommand.php:58)
                     //           see) https://github.com/Intervention/image/issues/567#issuecomment-224230343
                     // $image = $image->fit($resize_width, $resize_height, function ($constraint) {
-                    $image = $image->resize($resize_width, $resize_height, function ($constraint) {
-                        // 横幅を指定する。高さは自動調整
-                        $constraint->aspectRatio();
-
-                        // 小さい画像が大きくなってぼやけるのを防止
-                        $constraint->upsize();
-                    });
+                    $image = $image->scaleDown($resize_width, $resize_height);
 
                     // 画像の回転対応: orientate()
-                    $image = $image->orientate();
+                    $image = $image->orient();
 
                     $upload = Uploads::create([
                         'client_original_name' => $image_file->getClientOriginalName(),
                         'mimetype'             => $image_file->getClientMimeType(),
                         'extension'            => $image_file->getClientOriginalExtension(),
-                        'size'                 => $image->filesize(),
+                        'size'                 => $image_file->getSize(),
                         'page_id'              => $request->page_id,
                         'plugin_name'          => $request->plugin_name,
                     ]);
@@ -889,7 +870,7 @@ EOD;
                     $image->save(storage_path('app/') . $directory . '/' . $upload->id . '.' . $image_file->getClientOriginalExtension());
 
                     // bugfix: リサイズ後のfilesizeは、$image->save()後でないと取得できないため、filesizeをupdate.
-                    $upload->size = $image->filesize();
+                    $upload->size = filesize(storage_path('app/') . $directory . '/' . $upload->id . '.' . $image_file->getClientOriginalExtension());
                     $upload->save();
                 } else {
                     // そのまま画像

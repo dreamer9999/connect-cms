@@ -8,7 +8,7 @@
  * @see resources\views\layouts\app.blade.php
  * @see vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\views\503.blade.php
  * @see vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\views\minimal.blade.php
- * @see \App\Http\Middleware\CheckForMaintenanceMode::class
+ * @see \App\Http\Middleware\PreventRequestsDuringMaintenance::class
 --}}
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
